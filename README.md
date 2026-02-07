@@ -2,6 +2,21 @@
 
 A full-stack quiz app where instructors can create quizzes using an AI chatbot, and students can take them.
 
+Features:
+- AI Assistant helps with CRUD actions on quizzes for instructors
+- Manually create quizes
+- Sign up and Log in: Instructor or Student roles
+- Quiz analytics for both instructors and students
+- BYU & U of U themes 😜
+- Students can take quizzes and see the results
+- Decent UI/UX(not sure if it's responsive though)
+
+What I didn't do:
+- Quiz options dedupe(there is a unique constraint but AI model doesn't know about existing options when generating)
+- Useful loggings or tracings
+- Useful analytics in the UI. There are some, but could use some improvements
+- Tests could be more thorough. But I do have some unit/integration tests and AI benchmark tests that are acceptable
+
 **Built for**: AI Engineer Interview
 
 ## Prerequisites
@@ -215,10 +230,6 @@ Full docs at http://localhost:8000/docs
 - httpOnly cookies (using localStorage)
 - Rate limiting
 - Email verification
-- Quiz options dedupe(there is a unique constraint but AI model doesn't know about existing options when generating)
-- Useful loggings or tracings
-- Useful analytics in the UI. There are some, but could use some improvements
-- Tests could be more thorough. But I do have some unit/integration tests and AI benchmark tests.
 
 ---
 
