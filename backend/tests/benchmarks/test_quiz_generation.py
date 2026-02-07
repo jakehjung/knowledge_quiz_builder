@@ -92,11 +92,11 @@ Generate exactly 5 questions. Ensure all answers are factually accurate."""
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a quiz generation assistant. Generate educational quizzes with accurate information.",
+                        "content": "You are a quiz generation assistant. Generate educational quizzes with accurate information. Always respond with valid JSON.",
                     },
                     {
                         "role": "user",
-                        "content": f"Generate a 5-question quiz about {topic}. Include explanations for each answer.",
+                        "content": f"Generate a 5-question quiz about {topic}. Include explanations for each answer. Return as JSON.",
                     },
                 ],
                 response_format={"type": "json_object"},
@@ -141,10 +141,10 @@ Generate exactly 5 questions. Ensure all answers are factually accurate."""
         response = await openai_client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "You are a quiz generation assistant."},
+                {"role": "system", "content": "You are a quiz generation assistant. Always respond with valid JSON."},
                 {
                     "role": "user",
-                    "content": "Generate a 5-question quiz about world geography.",
+                    "content": "Generate a 5-question quiz about world geography. Return as JSON.",
                 },
             ],
             response_format={"type": "json_object"},
@@ -207,11 +207,11 @@ Generate exactly 5 questions. Ensure all answers are factually accurate."""
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a quiz generation assistant. Always include detailed explanations for why each answer is correct.",
+                    "content": "You are a quiz generation assistant. Always include detailed explanations for why each answer is correct. Respond with valid JSON.",
                 },
                 {
                     "role": "user",
-                    "content": "Generate a 5-question quiz about basic chemistry.",
+                    "content": "Generate a 5-question quiz about basic chemistry. Return as JSON.",
                 },
             ],
             response_format={"type": "json_object"},
@@ -284,7 +284,7 @@ class TestQuizGenerationWithRAG:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a quiz generation assistant. Use the provided context to create accurate quiz questions.",
+                    "content": "You are a quiz generation assistant. Use the provided context to create accurate quiz questions. Respond with valid JSON.",
                 },
                 {
                     "role": "user",
@@ -292,7 +292,7 @@ class TestQuizGenerationWithRAG:
 
 {wiki_context}
 
-Generate a 5-question quiz testing understanding of this topic. Include specific facts from the context.""",
+Generate a 5-question quiz testing understanding of this topic. Include specific facts from the context. Return as JSON.""",
                 },
             ],
             response_format={"type": "json_object"},

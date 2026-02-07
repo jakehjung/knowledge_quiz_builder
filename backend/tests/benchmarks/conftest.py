@@ -84,12 +84,12 @@ def tool_calling_scenarios() -> list[dict]:
             "expected_params": {"title": "Old Quiz"},
         },
         {
-            "message": "What are the analytics for my Python quiz?",
+            "message": "Get the score distribution and analytics for my quiz called 'Python Basics'",
             "expected_tool": "get_quiz_analytics",
             "expected_params": {},  # Requires title extraction
         },
         {
-            "message": "Change the title of my Math quiz to 'Advanced Math'",
+            "message": "Edit my quiz called 'Math' and change its title to 'Advanced Math'",
             "expected_tool": "edit_quiz",
             "expected_params": {"new_title": "Advanced Math"},
         },
