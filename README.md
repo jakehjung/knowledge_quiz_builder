@@ -215,6 +215,10 @@ Full docs at http://localhost:8000/docs
 - httpOnly cookies (using localStorage)
 - Rate limiting
 - Email verification
+- Quiz options dedupe(there is a unique constraint but AI model doesn't know about existing options when generating)
+- Useful loggings or tracings
+- Useful analytics in the UI. There are some, but could use some improvements
+- Tests could be more thorough. But I do have some unit/integration tests and AI benchmark tests.
 
 ---
 
