@@ -2,7 +2,7 @@
 
 A full-stack quiz app where instructors can create quizzes using an AI chatbot, and students can take them.
 
-**Built for**: System Design Interview
+**Built for**: AI Engineer Interview
 
 ## Prerequisites
 
