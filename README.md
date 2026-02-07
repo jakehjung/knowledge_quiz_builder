@@ -54,131 +54,94 @@ npm run dev
 
 ### High-Level Architecture Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                                  CLIENT                                      │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                     React + TypeScript (Vite)                          │  │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │  │
-│  │  │   Pages     │  │ Components  │  │   Hooks     │  │  Services   │  │  │
-│  │  │  - Login    │  │  - ChatPanel│  │  - useAuth  │  │  - api.ts   │  │  │
-│  │  │  - Quiz*    │  │  - Layout   │  │  - useTheme │  │  (Axios +   │  │  │
-│  │  │  - Analytics│  │  - Mascots  │  │  - useToast │  │   refresh)  │  │  │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └──────┬──────┘  │  │
-│  └────────────────────────────────────────────────────────────┼──────────┘  │
-└───────────────────────────────────────────────────────────────┼─────────────┘
-                                                                │
-                                                    REST API (JSON)
-                                                                │
-┌───────────────────────────────────────────────────────────────┼─────────────┐
-│                                  SERVER                       │              │
-│  ┌────────────────────────────────────────────────────────────┼──────────┐  │
-│  │                      FastAPI (Python 3.11+)                │          │  │
-│  │  ┌─────────────────────────────────────────────────────────┼───────┐  │  │
-│  │  │                       ROUTERS                           │       │  │  │
-│  │  │  /api/auth/*  /api/quizzes/*  /api/attempts/*  /api/chat│       │  │  │
-│  │  └─────────────────────────────────────────────────────────┼───────┘  │  │
-│  │                              │                             │          │  │
-│  │  ┌───────────────────────────▼─────────────────────────────▼───────┐  │  │
-│  │  │                        SERVICES                                 │  │  │
-│  │  │  AuthService  QuizService  AttemptService  AIService  Analytics │  │  │
-│  │  └───────────────────────────┬─────────────────────┬───────────────┘  │  │
-│  │                              │                     │                  │  │
-│  │  ┌───────────────────────────▼──────┐   ┌─────────▼───────────────┐  │  │
-│  │  │      SQLAlchemy 2.0 (Async)      │   │    External Services    │  │  │
-│  │  │  User, Quiz, Question, Attempt   │   │  ┌─────────────────┐    │  │  │
-│  │  └───────────────┬──────────────────┘   │  │  OpenAI GPT-4o  │    │  │  │
-│  │                  │                       │  │  (Function      │    │  │  │
-│  │                  │                       │  │   Calling)      │    │  │  │
-│  │                  │                       │  └─────────────────┘    │  │  │
-│  │                  │                       │  ┌─────────────────┐    │  │  │
-│  │                  │                       │  │  Wikipedia API  │    │  │  │
-│  │                  │                       │  │  (RAG Context)  │    │  │  │
-│  └──────────────────┼───────────────────────┴──┴─────────────────┴────┘  │
-│                     │                                                     │
-└─────────────────────┼─────────────────────────────────────────────────────┘
-                      │
-           ┌──────────▼──────────┐
-           │    PostgreSQL 15    │
-           │  ┌───────────────┐  │
-           │  │ users         │  │
-           │  │ quizzes       │  │
-           │  │ questions     │  │
-           │  │ quiz_attempts │  │
-           │  │ attempt_answer│  │
-           │  │ refresh_tokens│  │
-           │  └───────────────┘  │
-           └─────────────────────┘
+```mermaid
+flowchart TB
+    subgraph CLIENT["CLIENT - React + TypeScript (Vite)"]
+        subgraph FE_Components["Frontend"]
+            Pages["Pages<br/>- Login<br/>- Quiz*<br/>- Analytics"]
+            Components["Components<br/>- ChatPanel<br/>- Layout<br/>- Mascots"]
+            Hooks["Hooks<br/>- useAuth<br/>- useTheme<br/>- useToast"]
+            Services["Services<br/>- api.ts<br/>(Axios + refresh)"]
+        end
+    end
+
+    subgraph SERVER["SERVER - FastAPI (Python 3.11+)"]
+        subgraph Routers["ROUTERS"]
+            Auth["/api/auth/*"]
+            Quizzes["/api/quizzes/*"]
+            Attempts["/api/attempts/*"]
+            Chat["/api/chat"]
+        end
+
+        subgraph ServicesLayer["SERVICES"]
+            AuthService["AuthService"]
+            QuizService["QuizService"]
+            AttemptService["AttemptService"]
+            AIService["AIService"]
+            AnalyticsService["Analytics"]
+        end
+
+        subgraph DataLayer["DATA LAYER"]
+            ORM["SQLAlchemy 2.0 (Async)<br/>User, Quiz, Question, Attempt"]
+        end
+
+        subgraph External["EXTERNAL SERVICES"]
+            OpenAI["OpenAI GPT-4o<br/>(Function Calling)"]
+            Wikipedia["Wikipedia API<br/>(RAG Context)"]
+        end
+    end
+
+    subgraph DB["PostgreSQL 15"]
+        Tables["users<br/>quizzes<br/>questions<br/>quiz_attempts<br/>attempt_answers<br/>refresh_tokens"]
+    end
+
+    CLIENT -->|"REST API (JSON)"| SERVER
+    Routers --> ServicesLayer
+    ServicesLayer --> DataLayer
+    ServicesLayer --> External
+    DataLayer --> DB
 ```
 
 ### Data Flow
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                        QUIZ GENERATION FLOW                              │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  1. Instructor sends: "Create a quiz about photosynthesis"               │
-│                              │                                           │
-│                              ▼                                           │
-│  2. Input Sanitization (prevent prompt injection)                        │
-│                              │                                           │
-│                              ▼                                           │
-│  3. Wikipedia API → Fetch "Photosynthesis" article (8000 chars max)      │
-│                              │                                           │
-│                              ▼                                           │
-│  4. GPT-4o with Function Calling                                         │
-│     - System prompt defines assistant behavior                           │
-│     - User message + Wikipedia context                                   │
-│     - Tool: generate_quiz(topic, title, tags, num_questions)             │
-│                              │                                           │
-│                              ▼                                           │
-│  5. GPT-4o returns tool call with quiz data                              │
-│                              │                                           │
-│                              ▼                                           │
-│  6. Tool Handler executes: creates Quiz + Questions in PostgreSQL        │
-│                              │                                           │
-│                              ▼                                           │
-│  7. GPT-4o generates human-readable response                             │
-│                              │                                           │
-│                              ▼                                           │
-│  8. Response returned to instructor: "I've created a quiz..."            │
-│                                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph QuizGeneration["QUIZ GENERATION FLOW"]
+        A["1. Instructor sends:<br/>'Create a quiz about photosynthesis'"] --> B["2. Input Sanitization<br/>(prevent prompt injection)"]
+        B --> C["3. Wikipedia API<br/>Fetch 'Photosynthesis' article<br/>(8000 chars max)"]
+        C --> D["4. GPT-4o with Function Calling<br/>- System prompt defines behavior<br/>- User message + Wikipedia context<br/>- Tool: generate_quiz(topic, title, tags, num_questions)"]
+        D --> E["5. GPT-4o returns<br/>tool call with quiz data"]
+        E --> F["6. Tool Handler executes:<br/>creates Quiz + Questions in PostgreSQL"]
+        F --> G["7. GPT-4o generates<br/>human-readable response"]
+        G --> H["8. Response returned to instructor:<br/>'I've created a quiz...'"]
+    end
 ```
 
 ### Authentication Flow
 
+```mermaid
+flowchart LR
+    subgraph Login["LOGIN FLOW"]
+        direction LR
+        C1["Client"] -->|"1. Credentials"| S1["Server"]
+        S1 -->|"2. Verify"| D1["Database"]
+        D1 -->|"3. User found"| S1
+        S1 -->|"4. Tokens<br/>(access: 15min, refresh: 7 days)"| C1
+    end
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        JWT TOKEN FLOW                                    │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  LOGIN                                                                  │
-│  ┌─────────┐         ┌─────────┐         ┌─────────┐                   │
-│  │ Client  │ ──1──▶  │ Server  │ ──2──▶  │   DB    │                   │
-│  │         │         │         │         │         │                   │
-│  │         │  ◀──4── │         │  ◀──3── │         │                   │
-│  └─────────┘         └─────────┘         └─────────┘                   │
-│     Store tokens        Create tokens       Verify password             │
-│     in localStorage     (access: 15min,     Store refresh_token hash   │
-│                         refresh: 7 days)                                │
-│                                                                         │
-│  API REQUEST (with expired access token)                                │
-│  ┌─────────┐         ┌─────────┐         ┌─────────┐                   │
-│  │ Client  │ ──1──▶  │ Server  │         │         │                   │
-│  │         │         │  401    │         │         │                   │
-│  │ Axios   │  ◀──2── │         │         │         │                   │
-│  │ Inter-  │         │         │         │         │                   │
-│  │ ceptor  │ ──3──▶  │ /refresh│ ──4──▶  │   DB    │                   │
-│  │         │         │         │         │ Verify  │                   │
-│  │         │  ◀──6── │         │  ◀──5── │  hash   │                   │
-│  │         │         │ New     │         │         │                   │
-│  │ Retry   │ ──7──▶  │ token   │         │         │                   │
-│  │ original│         │         │         │         │                   │
-│  └─────────┘         └─────────┘         └─────────┘                   │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+
+```mermaid
+flowchart LR
+    subgraph Refresh["TOKEN REFRESH FLOW (expired access token)"]
+        direction LR
+        C2["Client<br/>(Axios Interceptor)"] -->|"1. API Request"| S2["Server"]
+        S2 -->|"2. 401 Unauthorized"| C2
+        C2 -->|"3. /refresh"| S3["Server"]
+        S3 -->|"4. Verify hash"| D2["Database"]
+        D2 -->|"5. Valid"| S3
+        S3 -->|"6. New access token"| C2
+        C2 -->|"7. Retry original request"| S2
+    end
 ```
 
 ---
