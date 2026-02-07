@@ -4,27 +4,53 @@ A full-stack quiz app where instructors can create quizzes using an AI chatbot, 
 
 **Built for**: System Design Interview
 
+## Prerequisites
+
+- **Python 3.11+**
+- **Node.js 18+**
+- **PostgreSQL 14+**
+- **OpenAI API key** with GPT-4o access
+
 ## Quick Start
 
 ```bash
-# Start PostgreSQL
+# 1. Clone and enter the repo
+git clone https://github.com/jakehjung/knowledge_quiz_builder.git
+cd knowledge_quiz_builder
+
+# 2. Start PostgreSQL (macOS)
 brew services start postgresql@14
 createdb quiz_builder
 
-# Backend
+# 3. Backend setup
 cd backend
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # Edit: DATABASE_URL, OPENAI_API_KEY
+
+# 4. Configure environment
+cp .env.example .env
+# Then edit .env and set:
+#   DATABASE_URL=postgresql+asyncpg://YOUR_USERNAME@localhost:5432/quiz_builder
+#   OPENAI_API_KEY=sk-your-key-here
+# (Run `whoami` in terminal to get YOUR_USERNAME)
+
+# 5. Run migrations and start backend
 alembic upgrade head
 uvicorn app.main:app --reload
 
-# Frontend (new terminal)
+# 6. Frontend (open new terminal)
 cd frontend
-npm install && npm run dev
+npm install
+npm run dev
 ```
 
 Open http://localhost:5173
+
+### Try It Out
+
+1. **Register as Instructor** → access AI chatbot
+2. Click chat icon (bottom right) → *"Create a quiz about Python"*
+3. Open incognito, **register as Student** → take the quiz
 
 ---
 
@@ -196,8 +222,14 @@ Full docs at http://localhost:8000/docs
 
 **DB connection failed?**
 ```bash
+# macOS
 brew services list  # Check PostgreSQL is running
-createdb quiz_builder  # Create the database
+createdb quiz_builder
+
+# Linux
+sudo systemctl status postgresql
+sudo -u postgres createdb quiz_builder
+# DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/quiz_builder
 ```
 
 **OpenAI errors?**
@@ -207,6 +239,11 @@ createdb quiz_builder  # Create the database
 **Frontend can't connect?**
 - Backend running on :8000?
 - Check `vite.config.ts` proxy settings
+
+**Tests failing with missing module?**
+```bash
+pip install aiosqlite  # Required for test database
+```
 
 ---
 
