@@ -2,7 +2,7 @@
 
 A full-stack quiz app where instructors can create quizzes using an AI chatbot, and students can take them.
 
-Features:
+**Features**:
 - AI Assistant helps with CRUD actions on quizzes for instructors
 - Manually create quizes
 - Sign up and Log in: Instructor or Student roles
@@ -11,7 +11,7 @@ Features:
 - Students can take quizzes and see the results
 - Decent UI/UX(not sure if it's responsive though)
 
-What I didn't do:
+**What I didn't do**:
 - Quiz options dedupe(there is a unique constraint but AI model doesn't know about existing options when generating)
 - Useful loggings or tracings
 - Useful analytics in the UI. There are some, but could use some improvements
