@@ -16,6 +16,8 @@ What I didn't do:
 - Useful loggings or tracings
 - Useful analytics in the UI. There are some, but could use some improvements
 - Tests could be more thorough. But I do have some unit/integration tests and AI benchmark tests that are acceptable
+- Error handling:
+  - You might run into some AI hiccups. Since it's not fully agentic, it cannot handle all situations.
 
 **Built for**: AI Engineer Interview
 
