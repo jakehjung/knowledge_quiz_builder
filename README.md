@@ -3,21 +3,33 @@
 A full-stack quiz app where instructors can create quizzes using an AI chatbot, and students can take them.
 
 **Features**:
-- AI Assistant helps with CRUD actions on quizzes for instructors
-- Manually create quizes
-- Sign up and Log in: Instructor or Student roles
-- Quiz analytics for both instructors and students
-- BYU & U of U themes 😜
-- Students can take quizzes and see the results
-- Decent UI/UX(not sure if it's responsive though)
+- AI Assistant helps with CRUD actions on quizzes for instructors.
+- Manually create quizes.
+- Sign up and Log in: Instructor or Student roles.
+- Quiz analytics for both instructors and students.
+- BYU & U of U themes 😜.
+- Students can take quizzes and see the results.
+- Decent UI/UX(not sure if it's responsive though).
 
 **What I didn't do**:
-- Quiz options dedupe(there is a unique constraint but AI model doesn't know about existing options when generating)
-- Useful loggings or tracings
-- Useful analytics in the UI. There are some, but could use some improvements
-- Tests could be more thorough. But I do have some unit/integration tests and AI benchmark tests that are acceptable
+- Quiz options dedupe(there is a unique constraint but AI model doesn't know about existing options when generating).
+- Useful loggings or tracings.
+- Useful analytics in the UI. There are some, but could use some improvements.
+- Tests could be more thorough. But I do have some unit/integration tests and AI benchmark tests that are acceptable.
 - Error handling:
   - You might run into some AI hiccups. Since it's not fully agentic, it cannot handle all situations.
+
+**How I used AI to build this app**:
+- I used Claude Code to generate code.
+- First version of PRD.md was generated with the project requirements.
+- Final version of [PRD.md](./PRD.md)(what's in this repo now) was generated with the help of Claude Code's plan mode:
+  - Ask Claude Code to interview me with all edge cases and extra feature requirements that I wanted. Asked it to be as thorough as possible.
+  - At this point, the PRD was extremely detailed and accurate to what I wanted to build.
+  - Generating an accurate PRD was probably 30% of my time spent.
+- Claude Code's plan mode then generated the [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for implementing the actual application.
+- After reviewing the plan, code generation was executed.
+- At this point, the application was about 80% finished.
+- The final state of the app came after many iterations for bugs, change of plans etc.
 
 **Built for**: AI Engineer Interview
 
